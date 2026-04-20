@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sasha Snova</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=Fragment+Mono:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #070605;
+      --ink:   #d8d2c4;
+      --dim:   #5a5550;
+      --faint: #141210;
+      --warm:  #c8bfaa;
+      --thread:#2a2620;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: 22px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      mix-blend-mode: normal;
+    }
+
+    /* fade gradient behind nav so it reads over images */
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      bottom: -40px;
+      background: linear-gradient(var(--bg) 60%, transparent);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .nav-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-style: normal;
+      font-weight: 300;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.25s;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ══════════════════════════════════════
+       HERO — Mnemosyne panel
+    ══════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--faint);
+    }
+
+    /* floating image panels */
+    .panel {
+      position: absolute;
+      background: #0f0e0c;
+      overflow: hidden;
+    }
+
+    .panel img,
+    .panel video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.75;
+      display: block;
+    }
+
+    /* placeholder state */
+    .panel-ph {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 10px;
+    }
+
+    .panel-ph span {
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #1e1c18;
+    }
+
+    /* SVG thread layer */
+    .threads {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* panel captions */
+    .panel-cap {
+      position: absolute;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      line-height: 1.6;
+      z-index: 3;
+    }
+
+    /* hero name */
+    .hero-name {
+      position: absolute;
+      z-index: 4;
+      bottom: 60px;
+      left: 44px;
+    }
+
+    .hero-name h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(64px, 10vw, 148px);
+      font-weight: 200;
+      font-style: italic;
+      line-height: 0.87;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+
+    .hero-name .sub {
+      margin-top: 16px;
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-name .sub::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--thread);
+    }
+
+    /* ══════════════════════════════════════
+       ABOUT
+    ══════════════════════════════════════ */
+    #about {
+      padding: 96px 44px 96px;
+      border-bottom: 1px solid var(--faint);
+      display: grid;
+      grid-template-columns: 44px 1fr 1fr;
+      gap: 0 64px;
+    }
+
+    .about-marker {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      align-self: start;
+      padding-top: 4px;
+    }
+
+    .about-body p {
+      font-size: 13.5px;
+      line-height: 1.85;
+      color: var(--ink);
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      margin-bottom: 24px;
+    }
+
+    .about-body p:last-child { margin-bottom: 0; }
+
+    .about-body .lede {
+      font-style: italic;
+      font-size: clamp(17px, 2.2vw, 24px);
+      line-height: 1.45;
+      color: var(--warm);
+      margin-bottom: 32px;
+    }
+
+    .about-body p.small {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11px;
+      color: var(--dim);
+      font-style: normal;
+    }
+
+    .about-index {
+      align-self: start;
+      border-left: 1px solid var(--faint);
+      padding-left: 44px;
+    }
+
+    .idx-row {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--faint);
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 12px;
+    }
+
+    .idx-row:last-child { border-bottom: none; }
+
+    .idx-key {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding-top: 1px;
+    }
+
+    .idx-val {
+      font-size: 11.5px;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .idx-val a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--thread);
+      transition: border-color 0.2s;
+    }
+
+    .idx-val a:hover { border-color: var(--dim); }
+
+    /* ══════════════════════════════════════
+       WORKS — Atlas panel arrangement
+    ══════════════════════════════════════ */
+    #works {
+      border-bottom: 1px solid var(--faint);
+    }
+
+    .works-header {
+      padding: 32px 44px;
+      border-bottom: 1px solid var(--faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .works-header .wh-left {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+    }
+
+    .sec-num {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+    }
+
+    .sec-t {
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .works-header .wh-note {
+      font-size: 9px;
+      color: #2e2c28;
+      font-style: italic;
+    }
+
+    /* atlas canvas */
+    .atlas {
+      position: relative;
+      min-height: 900px;
+      overflow: hidden;
+    }
+
+    /* SVG threads inside atlas */
+    .atlas-threads {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* work panels */
+    .w-panel {
+      position: absolute;
+      background: #0d0c0a;
+      z-index: 3;
+      cursor: default;
+      transition: z-index 0s;
+    }
+
+    .w-panel:hover { z-index: 10; }
+
+    .w-panel .w-img {
+      display: block;
+      overflow: hidden;
+    }
+
+    .w-panel .w-img img,
+    .w-panel .w-img video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.7;
+      transition: opacity 0.4s;
+    }
+
+    .w-panel:hover .w-img img,
+    .w-panel:hover .w-img video { opacity: 0.9; }
+
+    .w-panel .w-img .w-ph {
+      width: 100%;
+      height: 100%;
+      background: #0f0e0c;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 10px;
+      min-height: 60px;
+    }
+
+    .w-panel .w-img .w-ph span {
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #1e1c18;
+    }
+
+    .w-panel .w-caption {
+      padding: 10px 12px 12px;
+      border-top: 1px solid #161412;
+    }
+
+    .w-caption .w-title {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--warm);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .w-caption .w-meta {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      line-height: 1.65;
+    }
+
+    .w-caption .w-year {
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: #2e2c28;
+      margin-bottom: 4px;
+    }
+
+    /* ══════════════════════════════════════
+       CV
+    ══════════════════════════════════════ */
+    #cv {
+      border-bottom: 1px solid var(--faint);
+    }
+
+    .cv-header {
+      padding: 32px 44px;
+      border-bottom: 1px solid var(--faint);
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+    }
+
+    .cv-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .cv-col {
+      padding: 56px 44px;
+    }
+
+    .cv-col:first-child {
+      border-right: 1px solid var(--faint);
+    }
+
+    .cv-group { margin-bottom: 44px; }
+    .cv-group:last-child { margin-bottom: 0; }
+
+    .cv-gtitle {
+      font-size: 8.5px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--faint);
+      margin-bottom: 0;
+    }
+
+    .cv-entry {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--faint);
+    }
+
+    .cv-entry:last-child { border-bottom: none; }
+
+    .cv-y {
+      font-size: 9px;
+      color: var(--dim);
+      padding-top: 1px;
+      letter-spacing: 0.05em;
+    }
+
+    .cv-t {
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .cv-t em {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    .cv-t small {
+      display: block;
+      font-size: 10px;
+      color: var(--dim);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    footer p, footer a {
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--ink); }
+    .footer-links { display: flex; gap: 24px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      nav { padding: 20px 20px; }
+      #about {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 64px 20px;
+      }
+      .about-marker { writing-mode: horizontal-tb; transform: none; }
+      .about-index { border-left: none; border-top: 1px solid var(--faint); padding-left: 0; padding-top: 32px; }
+      .atlas { min-height: 1400px; }
+      .cv-body { grid-template-columns: 1fr; }
+      .cv-col:first-child { border-right: none; border-bottom: 1px solid var(--faint); }
+      .cv-col { padding: 40px 20px; }
+      .cv-header, .works-header { padding: 24px 20px; }
+      footer { padding: 24px 20px; }
+      .hero-name { left: 20px; bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">Sasha Snova</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#works">Works</a>
+    <a href="#cv">CV</a>
+    <a href="mailto:your@email.com">Contact</a><!-- REPLACE -->
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div id="hero">
+
+  <!-- Thread SVG behind panels -->
+  <svg class="threads" viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <line x1="320" y1="200" x2="620" y2="340" stroke="#1e1c18" stroke-width="0.7" stroke-dasharray="3,7"/>
+    <line x1="620" y1="340" x2="980" y2="180" stroke="#1e1c18" stroke-width="0.7" stroke-dasharray="3,7"/>
+    <line x1="980" y1="180" x2="1200" y2="480" stroke="#1e1c18" stroke-width="0.7" stroke-dasharray="3,7"/>
+    <line x1="320" y1="200" x2="180" y2="500" stroke="#1e1c18" stroke-width="0.5" stroke-dasharray="2,9"/>
+    <line x1="620" y1="340" x2="820" y2="560" stroke="#1e1c18" stroke-width="0.5" stroke-dasharray="2,9"/>
+  </svg>
+
+  <!-- Panel A — large left -->
+  <div class="panel" style="left:8%;top:14%;width:22%;aspect-ratio:3/4;z-index:3;">
+    <div class="panel-ph"><span>image</span></div>
+  </div>
+
+  <!-- Panel B — centre -->
+  <div class="panel" style="left:36%;top:9%;width:26%;aspect-ratio:16/9;z-index:3;">
+    <div class="panel-ph"><span>image</span></div>
+  </div>
+
+  <!-- Panel C — upper right -->
+  <div class="panel" style="right:6%;top:12%;width:18%;aspect-ratio:4/5;z-index:3;">
+    <div class="panel-ph"><span>image</span></div>
+  </div>
+
+  <!-- Panel D — mid right -->
+  <div class="panel" style="right:8%;top:50%;width:22%;aspect-ratio:16/10;z-index:3;">
+    <div class="panel-ph"><span>image</span></div>
+  </div>
+
+  <!-- Panel E — centre low -->
+  <div class="panel" style="left:40%;top:54%;width:20%;aspect-ratio:1/1;z-index:3;">
+    <div class="panel-ph"><span>image</span></div>
+  </div>
+
+  <!-- small caption annotations -->
+  <div class="panel-cap" style="left:8%;top:calc(14% + 22vw * 4/3 + 6px);">I. Belgrade, 2026</div>
+  <div class="panel-cap" style="left:36%;top:calc(9% + 26vw * 9/16 + 6px);">II. Imprint</div>
+  <div class="panel-cap" style="right:6%;top:calc(12% + 18vw * 5/4 + 6px);">III.</div>
+
+  <!-- Hero name block -->
+  <div class="hero-name">
+    <h1>Sasha<br>Snova</h1>
+    <div class="sub">Media Artist · Belgrade</div>
+  </div>
+
+</div>
+
+<!-- ══ ABOUT ══ -->
+<section id="about">
+  <div class="about-marker">01 — About</div>
+
+  <div class="about-body">
+    <p class="lede">
+      The image is not a goal — but a trace of the collision between body and system.
+    </p>
+    <p>
+      Sasha Snova is a media artist working with moving image, generative AI, and live performance. With a background in film and television, she works across moving image and real-time systems.
+    </p>
+    <p>
+      Her practice engages the body and environment as sources of signal — where physiological and spatial data become parameters that shape the behaviour of a moving image. The visual does not function as representation, but as the output of a system responding to live conditions.
+    </p>
+    <p>
+      Rather than producing fixed images, she constructs environments in which perception shifts between states of stability and disruption. Her work is drawn to liminal states: moments when the familiar begins to feel strange, when reality seems to crack and something uncertain starts to emerge.
+    </p>
+    <p class="small">
+      Since 2025 she organises BYOB (Bring Your Own Beamer) in Belgrade — an open platform for media artists.
+    </p>
+  </div>
+
+  <div class="about-index">
+    <div class="idx-row">
+      <span class="idx-key">Born</span>
+      <span class="idx-val">1991</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-key">Based</span>
+      <span class="idx-val">Belgrade, Serbia</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-key">Practice</span>
+      <span class="idx-val">Body and environment as sources of signal. The visual as output of a live system — not representation, but response. Environments in which perception shifts between stability and disruption.</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-key">Tools</span>
+      <span class="idx-val">TouchDesigner · Resolume · Stable Diffusion · StreamDiffusion · ComfyUI · EEG · motion tracking</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-key">Education</span>
+      <span class="idx-val">MA Film Production<br>RSVPU, 2013</span>
+    </div>
+    <div class="idx-row">
+      <span class="idx-key">Contact</span>
+      <span class="idx-val">
+        <a href="mailto:your@email.com">your@email.com</a><br><!-- REPLACE -->
+        <a href="https://instagram.com/yourhandle" target="_blank">Instagram</a> ·
+        <a href="https://t.me/yourhandle" target="_blank">Telegram</a><!-- REPLACE -->
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WORKS ══ -->
+<section id="works">
+  <div class="works-header">
+    <div class="wh-left">
+      <span class="sec-num">02</span>
+      <span class="sec-t">Works</span>
+    </div>
+    <span class="wh-note">Tafel I — VII</span>
+  </div>
+
+  <div class="atlas">
+
+    <!-- Atlas thread connections -->
+    <svg class="atlas-threads" viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <!-- I → II -->
+      <line x1="280" y1="180" x2="560" y2="240" stroke="#1e1c18" stroke-width="0.8" stroke-dasharray="3,6"/>
+      <!-- II → III -->
+      <line x1="680" y1="220" x2="1020" y2="130" stroke="#1e1c18" stroke-width="0.8" stroke-dasharray="3,6"/>
+      <!-- I → IV -->
+      <line x1="180" y1="310" x2="260" y2="530" stroke="#1e1c18" stroke-width="0.6" stroke-dasharray="2,8"/>
+      <!-- II → V -->
+      <line x1="620" y1="330" x2="730" y2="540" stroke="#1e1c18" stroke-width="0.6" stroke-dasharray="2,8"/>
+      <!-- III → VI -->
+      <line x1="1100" y1="270" x2="1180" y2="500" stroke="#1e1c18" stroke-width="0.6" stroke-dasharray="2,8"/>
+      <!-- IV → V -->
+      <line x1="380" y1="610" x2="660" y2="630" stroke="#1e1c18" stroke-width="0.5" stroke-dasharray="2,10"/>
+      <!-- VI → VII -->
+      <line x1="1080" y1="650" x2="860" y2="740" stroke="#1e1c18" stroke-width="0.5" stroke-dasharray="2,10"/>
+    </svg>
+
+    <!-- PANEL I — Imprint (in development) -->
+    <div class="w-panel" style="left:30%;top:3%;width:26%;">
+      <div class="w-img" style="aspect-ratio:16/9;">
+        <div class="w-ph"><span>image / video</span></div>
+        <!-- <img src="imprint.jpg" alt=""> -->
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2026 — · I</div>
+        <div class="w-title">Imprint</div>
+        <div class="w-meta">Generative video · live darkroom photochemical printing on stage<br><span style="font-style:italic;color:#3a3630;">in development</span></div>
+      </div>
+    </div>
+
+    <!-- PANEL II — Subconscious Negativity -->
+    <div class="w-panel" style="left:4%;top:5%;width:22%;">
+      <div class="w-img" style="aspect-ratio:3/4;">
+        <div class="w-ph"><span>image / video</span></div>
+        <!-- <img src="subconscious-negativity.jpg" alt=""> -->
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2026 · II</div>
+        <div class="w-title">Subconscious Negativity</div>
+        <div class="w-meta">EEG performance · real-time generative video<br>Sound: Vladimir Razhev</div>
+      </div>
+    </div>
+
+    <!-- PANEL III — Turbid Waters -->
+    <div class="w-panel" style="right:4%;top:4%;width:20%;">
+      <div class="w-img" style="aspect-ratio:4/5;">
+        <div class="w-ph"><span>image / video</span></div>
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2025 · III</div>
+        <div class="w-title">Turbid Waters</div>
+        <div class="w-meta">Multimedia performance<br>Performance Art Salon, Belgrade</div>
+      </div>
+    </div>
+
+    <!-- PANEL IV — Latent Rite -->
+    <div class="w-panel" style="left:3%;top:52%;width:24%;">
+      <div class="w-img" style="aspect-ratio:16/10;">
+        <div class="w-ph"><span>image / video</span></div>
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2025 · IV</div>
+        <div class="w-title">Latent Rite</div>
+        <div class="w-meta">Immersive installation · Solo show<br>KP Radionica, Belgrade</div>
+      </div>
+    </div>
+
+    <!-- PANEL V — Slightly Trembling -->
+    <div class="w-panel" style="left:33%;top:49%;width:19%;">
+      <div class="w-img" style="aspect-ratio:1/1;">
+        <div class="w-ph"><span>image / video</span></div>
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2025 · V</div>
+        <div class="w-title">Slightly Trembling</div>
+        <div class="w-meta">Media performance<br>KP Radionica, Belgrade</div>
+      </div>
+    </div>
+
+    <!-- PANEL VI — Oracle -->
+    <div class="w-panel" style="right:5%;top:46%;width:21%;">
+      <div class="w-img" style="aspect-ratio:3/2;">
+        <div class="w-ph"><span>image / video</span></div>
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2016 · VI</div>
+        <div class="w-title">Oracle</div>
+        <div class="w-meta">Interactive installation<br>Undark Festival, Ekaterinburg</div>
+      </div>
+    </div>
+
+    <!-- PANEL VII — Urbaurus, small, bottom -->
+    <div class="w-panel" style="left:58%;top:76%;width:16%;">
+      <div class="w-img" style="aspect-ratio:4/3;">
+        <div class="w-ph"><span>image / video</span></div>
+      </div>
+      <div class="w-caption">
+        <div class="w-year">2015 · VII</div>
+        <div class="w-title">Urbaurus</div>
+        <div class="w-meta">Interactive installation<br>Undark Festival, Ekaterinburg</div>
+      </div>
+    </div>
+
+  </div><!-- /atlas -->
+</section>
+
+<!-- ══ CV ══ -->
+<section id="cv">
+  <div class="cv-header">
+    <span class="sec-num">03</span>
+    <span class="sec-t">CV</span>
+  </div>
+  <div class="cv-body">
+
+    <div class="cv-col">
+      <div class="cv-group">
+        <div class="cv-gtitle">Performances &amp; Exhibitions</div>
+        <div class="cv-entry"><span class="cv-y">2026</span><span class="cv-t"><em>Subconscious Negativity</em><small>EEG performance · BYOB Belgrade #2</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2025</span><span class="cv-t"><em>Latent Rite</em><small>Immersive installation, solo show · KP Radionica, Belgrade</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2025</span><span class="cv-t"><em>Slightly Trembling</em><small>Media performance · KP Radionica, Belgrade</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2025</span><span class="cv-t"><em>Turbid Waters</em><small>Performance Art Salon · Galerija Ostavinska, Belgrade</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2025</span><span class="cv-t"><em>Unfold</em><small>Body-reactive performance · KP Radionica, Belgrade</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2025</span><span class="cv-t"><em>Fields Music Festival</em><small>Live visual performance · Belgrade</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2023</span><span class="cv-t"><em>Rubezh: Liberty</em><small>Audiovisual performance · Bishkek, Kyrgyzstan</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2016</span><span class="cv-t"><em>Oracle</em><small>Interactive installation · Undark Festival, Yeltsin Centre, Ekaterinburg</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2015</span><span class="cv-t"><em>Urbaurus</em><small>Interactive installation · Undark Festival, Yeltsin Centre, Ekaterinburg</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2005</span><span class="cv-t"><em>Out Video Festival</em><small>Video art screening · Ekaterinburg</small></span></div>
+      </div>
+      <div class="cv-group">
+        <div class="cv-gtitle">Curatorial</div>
+        <div class="cv-entry"><span class="cv-y">2025 —</span><span class="cv-t"><em>BYOB Belgrade</em><small>Open platform for media artists</small></span></div>
+      </div>
+      <div class="cv-group">
+        <div class="cv-gtitle">Residencies</div>
+        <div class="cv-entry"><span class="cv-y">2021</span><span class="cv-t"><em>Siberian Media Campus</em><small>Kansk, Russia</small></span></div>
+      </div>
+    </div>
+
+    <div class="cv-col">
+      <div class="cv-group">
+        <div class="cv-gtitle">Education</div>
+        <div class="cv-entry"><span class="cv-y">2013</span><span class="cv-t"><em>MA Film Production</em> — with distinction<small>RSVPU, Ekaterinburg</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2015</span><span class="cv-t"><em>Undark Media Lab</em><small>Workshop · HR Stamenov · Ekaterinburg</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2022</span><span class="cv-t"><em>History of Contemporary Art</em><small>Boris Klyushnikov · KhMPT RSUH, online</small></span></div>
+        <div class="cv-entry"><span class="cv-y">2022</span><span class="cv-t"><em>Post-documentary in media culture</em><small>Asya Zhetvina &amp; Anna Sopova · Kontseptsiya, online</small></span></div>
+      </div>
+      <div class="cv-group">
+        <div class="cv-gtitle">Technical</div>
+        <div class="cv-entry"><span class="cv-y">RT</span><span class="cv-t">TouchDesigner · Resolume<small>Real-time video systems</small></span></div>
+        <div class="cv-entry"><span class="cv-y">AI</span><span class="cv-t">Stable Diffusion · StreamDiffusion · ComfyUI<small>Generative AI pipelines</small></span></div>
+        <div class="cv-entry"><span class="cv-y">Sensor</span><span class="cv-t">EEG · OSC · motion tracking<small>Sensor-based interaction</small></span></div>
+        <div class="cv-entry"><span class="cv-y">Post</span><span class="cv-t">Live broadcast · colour grading · editing<small>Film &amp; television background</small></span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Sasha Snova · Belgrade · © 2026</p>
+  <div class="footer-links">
+    <a href="https://instagram.com/yourhandle" target="_blank">Instagram</a><!-- REPLACE -->
+    <a href="https://t.me/yourhandle" target="_blank">Telegram</a><!-- REPLACE -->
+    <a href="mailto:your@email.com">Email</a><!-- REPLACE -->
+  </div>
+</footer>
+
+</body>
+</html>
